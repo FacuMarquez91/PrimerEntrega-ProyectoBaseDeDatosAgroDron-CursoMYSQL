@@ -61,6 +61,52 @@ experience VARCHAR (20), -- AÑOS DE EXPERIENCIA
 registration_date DATE
 );
 
+CREATE TABLE bill (
+id_bill INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+id_customer INT NOT NULL,
+amount DECIMAL (10, 2) NOT NULL,
+issue_date DATE NOT NULL,
+payment_status VARCHAR (20), -- ESTADO DE PAGO (PENDIENTE , PAGADO)
+CONSTRAINT FK_BILL_CUSTOMER FOREIGN KEY (id_customer) REFERENCES customer (id_customer)
+);
+
+
+CREATE TABLE mechanical_technical (
+id_technical INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+name_technical VARCHAR (30) NOT NULL,
+last_name_technical VARCHAR (40) NOT NULL,
+phone INT NOT NULL,
+speciality VARCHAR (50), -- especialidad (mantenimiento de drones , electrónica)
+registration_date DATE
+);
+
+ALTER TABLE mechanical_technical ADD COLUMN email VARCHAR (50) NOT NULL ;
+ALTER TABLE mechanical_technical MODIFY COLUMN phone VARCHAR (15) NOT NULL;
+
+
+
+
+CREATE TABLE drone_maintenance (
+id_maintenance INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+id_drone INT NOT NULL,
+id_technical INT NOT NULL,
+maintenance_date DATE NOT NULL,
+report TEXT NOT NULL,
+CONSTRAINT FK_DRONE_MAINTENANCE_DRONE FOREIGN KEY (id_drone) REFERENCES drone (id_drone)
+
+);
+
+ALTER TABLE drone_maintenance ADD CONSTRAINT FK_DRONE_MAINTENANCE_MECHANICAL_TECHNICAL FOREIGN KEY (id_technical) REFERENCES mechanical_technical(id_technical);
+ALTER TABLE drone_maintenance ADD COLUMN repair_cost FLOAT;
+
+-- AGREGAMOS UNA NUEVA TABLA AL ESQUEMA
+
+CREATE TABLE agro_chemical (
+id_agro_chemical INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+type_of_chemical VARCHAR (50) NOT NULL,
+price_per_liter DECIMAL(10,2) NOT NULL,
+liters_in_stock DECIMAL(10,2),
+expiration_date DATE);
 
 
 
@@ -100,45 +146,6 @@ ALTER TABLE service_completed ADD COLUMN id_agro_chemical INT;
 ALTER TABLE service_completed ADD CONSTRAINT FK_SERVICE_COMPLETED_AGRO_CHEMICAL FOREIGN KEY (id_agro_chemical) REFERENCES agro_chemical(id_agro_chemical);
 
 
-
-
-CREATE TABLE bill (
-id_bill INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-id_customer INT NOT NULL,
-amount DECIMAL (10, 2) NOT NULL,
-issue_date DATE NOT NULL,
-payment_status VARCHAR (20), -- ESTADO DE PAGO (PENDIENTE , PAGADO)
-CONSTRAINT FK_BILL_CUSTOMER FOREIGN KEY (id_customer) REFERENCES customer (id_customer)
-);
-
-
-
-
-CREATE TABLE mechanical_technical (
-id_technical INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-name_technical VARCHAR (30) NOT NULL,
-last_name_technical VARCHAR (40) NOT NULL,
-phone INT NOT NULL,
-speciality VARCHAR (50), -- especialidad (mantenimiento de drones , electrónica)
-registration_date DATE
-);
-
-ALTER TABLE mechanical_technical ADD COLUMN email VARCHAR (50) NOT NULL ;
-ALTER TABLE mechanical_technical MODIFY COLUMN phone VARCHAR (15) NOT NULL;
-
-
-CREATE TABLE drone_maintenance (
-id_maintenance INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-id_drone INT NOT NULL,
-id_technical INT NOT NULL,
-maintenance_date DATE NOT NULL,
-report TEXT NOT NULL,
-CONSTRAINT FK_DRONE_MAINTENANCE_DRONE FOREIGN KEY (id_drone) REFERENCES drone (id_drone)
-
-);
-
-ALTER TABLE drone_maintenance ADD CONSTRAINT FK_DRONE_MAINTENANCE_MECHANICAL_TECHNICAL FOREIGN KEY (id_technical) REFERENCES mechanical_technical(id_technical);
-ALTER TABLE drone_maintenance ADD COLUMN repair_cost FLOAT;
 
 
 
@@ -233,44 +240,6 @@ INSERT INTO pilot (id_pilot, name_pilot, last_name_pilot, phone, email, license_
 (14, 'Silvia', 'García', '3344556680', 'silvia.garcia@email.com', 'MEDIA', '8 años', '2016-09-03'),
 (15, 'Daniel', 'Hernández', '4455667791', 'daniel.hernandez@email.com', 'BÁSICA', '5 años', '2019-02-28');
 
--- INSERCIÓN DE DATOS EN TABLA CONTRACTED_SERVICE
-
-INSERT INTO contracted_service (id_customer, id_location, id_drone, hiring_date, type_of_work, service_status) VALUES
-(1, 1, 1, '2024-03-01', 'Fertilización de Soja', 'COMPLETADO'),
-(2, 2, 2, '2024-03-05', 'Control de Plagas en Maíz', 'EN PROCESO'),
-(3, 3, 3, '2024-03-10', 'Fertilización de Trigo', 'PENDIENTE'),
-(4, 4, 4, '2024-03-15', 'Control de Plagas en Girasol', 'COMPLETADO'),
-(5, 5, 5, '2024-03-20', 'Fertilización de Alfalfa', 'EN PROCESO'),
-(6, 6, 6, '2024-03-25', 'Control de Plagas en Arroz', 'PENDIENTE'),
-(7, 7, 7, '2024-03-30', 'Fertilización de Caña de Azúcar', 'COMPLETADO'),
-(8, 8, 8, '2024-04-01', 'Control de Plagas en Uvas', 'EN PROCESO'),
-(9, 9, 9, '2024-04-05', 'Fertilización de Tabaco', 'PENDIENTE'),
-(10, 10, 10, '2024-04-10', 'Control de Plagas en Yerba Mate', 'COMPLETADO'),
-(11, 11, 11, '2024-04-15', 'Fertilización de Frutas Finas', 'EN PROCESO'),
-(12, 12, 12, '2024-04-20', 'Control de Plagas en Olivos', 'PENDIENTE'),
-(13, 13, 13, '2024-04-25', 'Fertilización de Algodón', 'COMPLETADO'),
-(14, 14, 14, '2024-04-30', 'Control de Plagas en Ajo', 'EN PROCESO'),
-(15, 15, 15, '2024-05-01', 'Fertilización de Hortalizas', 'PENDIENTE');
-
-
--- INSERCIÓN DE DATOS EN TABLA SERVICE_COMPLETED
-
-INSERT INTO service_completed (id_service, id_pilot, date_of_realization, commets, id_location, id_drone, liters_used, id_agro_chemical) VALUES
-(1, 1, '2024-03-10', 'Fertilización realizada con éxito.', 1, 1, 40.0, 1),
-(4, 4, '2024-03-20', 'Control de plagas realizado sin problemas.', 4, 4, 20.0, 2),
-(7, 7, '2024-04-05', 'Fertilización completada.', 7, 7, 50.0, 3),
-(10, 10, '2024-04-15', 'Control de plagas finalizado.', 10, 10, 25.0, 4),
-(13, 13, '2024-04-30', 'Fertilización exitosa.', 13, 13, 60.0, 5),
-(2, 2, '2024-03-12', 'Control de plagas en maíz.', 2, 2, 15.0, 6),
-(3, 3, '2024-03-18', 'Fertilización de trigo iniciada.', 3, 3, 35.0, 7),
-(5, 5, '2024-03-25', 'Fertilización de alfalfa en curso.', 5, 5, 45.0, 8),
-(6, 6, '2024-03-30', 'Control de plagas en arroz.', 6, 6, 30.0, 9),
-(8, 8, '2024-04-08', 'Control de plagas en uvas.', 8, 8, 18.0, 10),
-(9, 9, '2024-04-12', 'Fertilización de tabaco.', 9, 9, 55.0, 11),
-(11, 11, '2024-04-18', 'Fertilización de frutas finas.', 11, 11, 28.0, 12),
-(12, 12, '2024-04-22', 'Control de plagas en olivos.', 12, 12, 32.0, 13),
-(14, 14, '2024-05-01', 'Control de plagas en ajo.', 14, 14, 22.0, 14),
-(15, 15, '2024-05-03', 'Fertilización de hortalizas.', 15, 15, 48.0, 15);
 
 -- INSERCIÓN DE DATOS EN TABLA BILL
 
@@ -311,6 +280,9 @@ INSERT INTO mechanical_technical (name_technical, last_name_technical, phone, sp
 ('Silvia', 'Fernández', '3344556679', 'Electrónica', '2017-06-05', 'silvia.fernandez@email.com'),
 ('Daniel', 'Hernández', '4455667790', 'Mantenimiento de drones', '2023-01-20', 'daniel.hernandez@email.com');
 
+
+
+
 -- INSERCIÓN DE DATOS EN TABLA DRONE_MAINTENANCE
 
 INSERT INTO drone_maintenance (id_drone, id_technical, maintenance_date, report, repair_cost) VALUES
@@ -349,7 +321,54 @@ INSERT INTO agro_chemical (type_of_chemical, price_per_liter, liters_in_stock, e
 ('Insecticida Sistémico I', 29.80, 180.00, '2025-11-15'),
 ('Acondicionador de Suelo J', 13.50, 550.00, '2024-09-30'),
 ('Estimulante de Raíces K', 27.20, 380.00, '2026-04-30');
-select * from agro_chemical;
+
+
+
+-- INSERCIÓN DE DATOS EN TABLA CONTRACTED_SERVICE
+
+INSERT INTO contracted_service (id_customer, id_location, id_drone, hiring_date, type_of_work, service_status) VALUES
+(1, 1, 1, '2024-03-01', 'Fertilización de Soja', 'COMPLETADO'),
+(2, 2, 2, '2024-03-05', 'Control de Plagas en Maíz', 'EN PROCESO'),
+(3, 3, 3, '2024-03-10', 'Fertilización de Trigo', 'PENDIENTE'),
+(4, 4, 4, '2024-03-15', 'Control de Plagas en Girasol', 'COMPLETADO'),
+(5, 5, 5, '2024-03-20', 'Fertilización de Alfalfa', 'EN PROCESO'),
+(6, 6, 6, '2024-03-25', 'Control de Plagas en Arroz', 'PENDIENTE'),
+(7, 7, 7, '2024-03-30', 'Fertilización de Caña de Azúcar', 'COMPLETADO'),
+(8, 8, 8, '2024-04-01', 'Control de Plagas en Uvas', 'EN PROCESO'),
+(9, 9, 9, '2024-04-05', 'Fertilización de Tabaco', 'PENDIENTE'),
+(10, 10, 10, '2024-04-10', 'Control de Plagas en Yerba Mate', 'COMPLETADO'),
+(11, 11, 11, '2024-04-15', 'Fertilización de Frutas Finas', 'EN PROCESO'),
+(12, 12, 12, '2024-04-20', 'Control de Plagas en Olivos', 'PENDIENTE'),
+(13, 13, 13, '2024-04-25', 'Fertilización de Algodón', 'COMPLETADO'),
+(14, 14, 14, '2024-04-30', 'Control de Plagas en Ajo', 'EN PROCESO'),
+(15, 15, 15, '2024-05-01', 'Fertilización de Hortalizas', 'PENDIENTE');
+
+
+-- INSERCIÓN DE DATOS EN TABLA SERVICE_COMPLETED
+
+INSERT INTO service_completed (id_service, id_pilot, date_of_realization, commets, id_location, id_drone, liters_used, id_agro_chemical) VALUES
+(1, 1, '2024-03-10', 'Fertilización realizada con éxito.', 1, 1, 40.0, 1),
+(4, 4, '2024-03-20', 'Control de plagas realizado sin problemas.', 4, 4, 20.0, 2),
+(7, 7, '2024-04-05', 'Fertilización completada.', 7, 7, 50.0, 3),
+(10, 10, '2024-04-15', 'Control de plagas finalizado.', 10, 10, 25.0, 4),
+(13, 13, '2024-04-30', 'Fertilización exitosa.', 13, 13, 60.0, 5),
+(2, 2, '2024-03-12', 'Control de plagas en maíz.', 2, 2, 15.0, 6),
+(3, 3, '2024-03-18', 'Fertilización de trigo iniciada.', 3, 3, 35.0, 7),
+(5, 5, '2024-03-25', 'Fertilización de alfalfa en curso.', 5, 5, 45.0, 8),
+(6, 6, '2024-03-30', 'Control de plagas en arroz.', 6, 6, 30.0, 9),
+(8, 8, '2024-04-08', 'Control de plagas en uvas.', 8, 8, 18.0, 10),
+(9, 9, '2024-04-12', 'Fertilización de tabaco.', 9, 9, 55.0, 11),
+(11, 11, '2024-04-18', 'Fertilización de frutas finas.', 11, 11, 28.0, 12),
+(12, 12, '2024-04-22', 'Control de plagas en olivos.', 12, 12, 32.0, 13),
+(14, 14, '2024-05-01', 'Control de plagas en ajo.', 14, 14, 22.0, 14),
+(15, 15, '2024-05-03', 'Fertilización de hortalizas.', 15, 15, 48.0, 15);
+
+
+
+
+
+
+
 -- CREACIÓN DE VISTAS 
 
 -- Vista VW_PAGOS_PENDIENTES, esta vista involucra diferentes campos de las tablas customer y bill.
@@ -577,7 +596,7 @@ CREATE TRIGGER trg_contracted_service_auditoria
 AFTER UPDATE ON contracted_service
 FOR EACH ROW
 BEGIN
-    INSERT INTO CONTRACTED_SERVICE_AUDITORIA (accion, nombre_tabla, usuario, fecha_modificacion) -- Corregido el nombre de la tabla
+    INSERT INTO CONTRACTED_SERVICE_AUDITORIA (accion, nombre_tabla, usuario, fecha_modificacion) 
     VALUES ('UPDATE', 'CONTRACTED_SERVICE', USER(), NOW());
 END //
 DELIMITER ;
@@ -590,7 +609,7 @@ AFTER UPDATE ON contracted_service
 FOR EACH ROW
 BEGIN
     IF OLD.service_status <> NEW.service_status THEN
-        INSERT INTO CONTRACTED_SERVICE_AUDITORIA_2 (camponuevo_campoanterior, accion, nombre_tabla, usuario, fecha_modificacion) -- Corregido el nombre de la tabla
+        INSERT INTO CONTRACTED_SERVICE_AUDITORIA_2 (camponuevo_campoanterior, accion, nombre_tabla, usuario, fecha_modificacion) 
         VALUES (CONCAT('CAMPO NUEVO: ', NEW.service_status, ', ID_NUEVO: ', NEW.id_service, ', CAMPO ANTERIOR: ', OLD.service_status, ', ID_ANTERIOR: ', OLD.id_service),
                 'UPDATE',
                 'CONTRACTED_SERVICE',
@@ -611,7 +630,7 @@ UPDATE contracted_service SET service_status = 'COMPLETADO' WHERE id_service = 2
 
 
 /* DEJO ESTE COMENTARIO CON RESPECTO A MI ULTIMO TRIGGER, TODO PARECE ESTAR BIEN O AL MENOS NO CONSIGO ENCONTRAR EL ERROR, SI PODRÍAN 
-CORREGIRMELO SERÍA GENIA. TENGO CREADAS AMBAS TABLAS DE AUDITORIAS Y ME APARECEN VACIAS CUANDO LAS CONSULTO, COMO DEBERÍA SER, PERO
+CORREGIRMELO SERÍA GENIAL. TENGO CREADAS AMBAS TABLAS DE AUDITORIAS Y ME APARECEN VACIAS CUANDO LAS CONSULTO, COMO DEBERÍA SER, PERO
 CUANDO QUIERO HACER EL UPDATE PARA CAMBIAR EL REGISTRO DEL CAMPO Y VER COMO REACCIONAN LAS TABLAS DE AUDITORÍAS, ME TIRA ESTE ERROR
 'Error Code: 1146. Table 'agrodron.contracted_service_audit' doesn't exist'. NO TENGO NINGUNA TABLA CREADA DE ESA MANERA, POR LO CUAL 
 ME RESULTA BASTANTE RARO, O NO ME ESTARÍA DANDO CUENTA DE LO QUE SUCEDE. ES MARTES 8:23 PM Y ME QUEDO SIN TIEMPO POR ESO ENTREGO DE ESTA MANERA.
